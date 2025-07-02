@@ -243,9 +243,13 @@ ChannelInfo channels[CHANNEL_COUNT];
 #if BOARD_KSOLOTI_CORE_H743 || BOARD_KSOLOTI_CORE_F427
 uint8_t txbuf[32] SPILINK_DMA_SECTION;
 uint8_t rxbuf[32] SPILINK_DMA_SECTION;
+#define CS_PORT (GPIOD)
+#define CS_PAD  (5)
 #else
 uint8_t txbuf[32] __attribute__ ((section (".sram2")));
 uint8_t rxbuf[32] __attribute__ ((section (".sram2")));
+#define CS_PORT (GPIOA)
+#define CS_PAD  (15)
 #endif
 
 void spi_error_cb(SPIDriver *spip) 
@@ -270,8 +274,8 @@ void spi_error_cb(SPIDriver *spip)
         .slave            = false,
         .data_cb          = NULL,
         .error_cb         = spi_error_cb,
-        .ssport           = GPIOA,
-        .sspad            = 15U,
+        .ssport           = CS_PORT,
+        .sspad            = CS_PAD,
         .cr1              = SPI_CR1_BR_0,
         .cr2              = 0U
     } ;
@@ -661,7 +665,7 @@ bool Initialise(void)
 	if(!bInititalised)
 	{
     // First setup SPI3
-    palSetPadMode(GPIOA, 15, PAL_MODE_OUTPUT_PUSHPULL); // CS
+    palSetPadMode(CS_PORT, CS_PAD, PAL_MODE_OUTPUT_PUSHPULL); // CS
     palSetPadMode(GPIOB, 3, PAL_MODE_OUTPUT_PUSHPULL); // SCK
     palSetPadMode(GPIOD, 6, PAL_MODE_OUTPUT_PUSHPULL); // MOSI
 
